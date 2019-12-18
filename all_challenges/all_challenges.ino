@@ -1,6 +1,4 @@
 #include <MPU6050.h>
-#include <Servo.h>
-
 // ******************** Constants ********************************************
 
 // For challenge 3
@@ -14,14 +12,14 @@
  int ki;
  int thresh; // set this to sensor value on black path
 
- *****************************************************************************
+ //*****************************************************************************
 
 
 
 
 // ***************** From robot example code  *******************************
 
-Servo servo;
+
 
 // Motor control pins : L298N H bridge
 const int enAPin = 6; // Left motor PWM speed control
@@ -128,26 +126,28 @@ void driveSine(int freq, int duration) {
 void Chall_2(int angle, int desired_angle, int kp) {
 
   //Determine error
-  change = angle-desired_angle;
+  int change = angle-desired_angle;
 
   //Write gas to motor pin.
   gas = change*kp;
 
  //Make sure it's between -255 and 255.
- if gas > 255
+ if (gas > 255)
     gas = 255;
- else if gas < -255
+ else if (gas < -255)
     gas = -255;
- end
+
 
   //Turn left or right.
-  if gas > 0
+  if (gas > 0) {
       go(RIGHT, abs(gas));
       go(LEFT,0);
-  else
+  }
+  else {
       go(LEFT, abs(gas));
       go(RIGHT,0);
-  end 
+  }
+
 }
 
 //******************************************************************************
@@ -155,7 +155,7 @@ void Chall_2(int angle, int desired_angle, int kp) {
 
 
 // ****************** Challenge 3*********
-void Chall_3(kp,kd,ki) {
+void Chall_3 (int kp,int kd, int ki, int level, int thresh) {
 
   p = level - thresh;
   
@@ -164,20 +164,20 @@ void Chall_3(kp,kd,ki) {
 
   i = i + p;
   
-  if p  = 0
+  if (p  = 0) {
      i = 0;
-  end
+  }
+  //end
 
  //100 as constant so that it will go straight when no error. (see left below)
   gas = 100 + (d*kd) + (p*kp) + (i*ki);
 
-  if gas > 255
+  if (gas > 255)
     gas = 255;
-  end
 
   //Because traveling counter-clockwise, we will only need to travel right
-  go(left, 100);
-  go(right, gas);
+  go(LEFT, 100);
+  go(RIGHT, gas);
 }
 
 // ***************************************************
@@ -186,17 +186,14 @@ void Chall_3(kp,kd,ki) {
 
 void setup() {
   Serial.begin(9600);
-  pinMode(trigPin, OUTPUT);
-  pinMode(echoPin, INPUT);
-  digitalWrite (trigPin, LOW);
   pinMode(enAPin, OUTPUT);
   pinMode(in1Pin, OUTPUT);
   pinMode(in2Pin, OUTPUT);
   pinMode(in3Pin, OUTPUT);
   pinMode(in4Pin, OUTPUT);
   pinMode(enBPin, OUTPUT);
-  servo.attach(servoPin);
-  servo.write(90);
+  //servo.attach(servoPin);
+  //servo.write(90);
   go(LEFT, 0);
   go(RIGHT, 0);
   testMotors();
@@ -216,6 +213,5 @@ void loop() {
   Serial.println("entered loop");
   driveSine(20,15000);
   delay(2000);
-  Chall_3(5,.5,.5);
 
 }
