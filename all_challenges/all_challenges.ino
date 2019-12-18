@@ -1,6 +1,9 @@
 #include <MPU6050.h>
 // ******************** Constants ********************************************
 
+// for challenge 1
+int mspeed;
+
 // For challenge 3
  static int i;
  static int prev_err;
@@ -79,7 +82,7 @@ void driveSine(int freq, int duration) {
   Serial.println(freq);
   int start = millis();
   int t = millis() - start;
-  int mspeed = 0;
+  mspeed = 0;
   while(t < duration) {
     Serial.print("t = ");
     Serial.println(t);
@@ -87,8 +90,6 @@ void driveSine(int freq, int duration) {
     if (mspeed > 255) {
       mspeed = 255;
     }
-    //analogWrite(enBPin,mspeed); // if you input a positive mspeed the motors won't spin...
-    //analogWrite(enAPin,mspeed); 
     Serial.print("moter speed = ");
     Serial.println(mspeed);
     go(LEFT,-mspeed);
@@ -103,7 +104,6 @@ void driveSine(int freq, int duration) {
   mspeed = 0;
   while(t < duration) {
     mspeed = sin(2*PI*freq*t)*255*20;
-    mspeed = sin(2*PI*freq*t)*255*20;
     if (mspeed > 255) {
       mspeed = 255;
     }
@@ -114,6 +114,55 @@ void driveSine(int freq, int duration) {
   go(LEFT,0);
   go(RIGHT,0);
   Serial.println("end of driveSine");
+}
+
+void sine2(int freq, int duration) {
+  int start = millis();
+  int t = millis() - start;
+  while (t < duration) {
+    Serial.println("in while");
+    mspeed = sin(2*PI*freq)*255;
+    go(LEFT,mspeed);
+    go(RIGHT,-mspeed);
+    Serial.println(mspeed);
+    t = millis() - start;
+  }  
+}
+
+
+void driveSinewave(double t, double freq)
+{
+ //double  T = 1/freq;
+  //double duration = T*1000;
+ double duration = 1000;
+  Serial.println("duration = ");
+  Serial.println(duration);
+  int start = millis();
+  int curr = millis() - start;
+  Serial.print("t is");
+  Serial.println(curr);
+  Serial.println("in drivesine");
+  double goSpeed;
+  while(curr < duration) {
+    goSpeed = sin(2*3.14*freq*t) * 255;
+    go(RIGHT, goSpeed);
+    go(LEFT, -goSpeed);
+    Serial.println("first while");
+    Serial.println(goSpeed);
+    curr = millis() - start;
+  }
+int   start2 = millis();
+curr = millis() - start2;
+  while(curr < duration) {
+    Serial.println("second");
+    goSpeed = sin(2*3.14*freq*t) * 255;
+    go(RIGHT,-goSpeed);
+    go(LEFT,goSpeed);
+    curr = millis() - start2;
+  }
+  go(RIGHT,0);
+  go(LEFT,0);
+
 }
 
 //**************************************************************************
@@ -167,7 +216,6 @@ void Chall_3 (int kp,int kd, int ki, int level, int thresh) {
   if (p  = 0) {
      i = 0;
   }
-  //end
 
  //100 as constant so that it will go straight when no error. (see left below)
   gas = 100 + (d*kd) + (p*kp) + (i*ki);
@@ -202,16 +250,27 @@ void setup() {
   gas = 0;
   i = 0;
   prev_err = 0;
+  mspeed = 0;
 
 
 
 }
 
-
+int k = 0;
+double freq[] = {0.5, 5, 10, 15, 20, 30, 50};
 void loop() {
   delay(2000);
   Serial.println("entered loop");
-  driveSine(20,15000);
-  delay(2000);
+  //driveSine(20,2000);
+  //sine2(50,5000);
+
+  // Challenge
+  driveSinewave(1000,freq[k]);
+  k++;
+  //delay(2000);
+
+
+  
+
 
 }
