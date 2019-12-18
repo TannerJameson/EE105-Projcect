@@ -1,5 +1,5 @@
-#include <MPU6050.h>
-#include <Servo.h>
+//#include <MPU6050.h>
+//#include <Servo.h>
 
 // ******************** Constants ********************************************
 
@@ -7,37 +7,36 @@
  static int i;
  static int prev_err;
  static int yaw;
- int level
+ int level;
  int p;
  int d;
  int gas;
  int kp;
  int kd;
  int ki;
+ int desired_angle;
  int yaw_int;
  int time_step;
  int16_t ax, ay, az;
  int16_t gy, gx, gz; 
  int thresh; // set this to sensor value on black path
- MPU6050 mpu; 
- *****************************************************************************
-
-
+// MPU6050 mpu; 
+// *****************************************************************************
 
 
 // ***************** From robot example code  *******************************
 
-Servo servo;
+//Servo servo;
 
 // Motor control pins : L298N H bridge
-const int enAPin = 6; // Left motor PWM speed control
-const int in1Pin = 7; // Left motor Direction 1
-const int in2Pin = 5; // Left motor Direction 2
+int enAPin = 6; // Left motor PWM speed control
+int in1Pin = 7; // Left motor Direction 1
+int in2Pin = 5; // Left motor Direction 2
 // I switched pins 4 and 2 to make the motor directions correspond to the test function
-const int in3Pin = 2; // Right motor Direction 1
-const int in4Pin = 4; // Right motor Direction 2
-const int enBPin = 3; // Right motor PWM speed control
-const int photo  = A1; // Photo detector pin level
+int in3Pin = 2; // Right motor Direction 1
+int in4Pin = 4; // Right motor Direction 2
+int enBPin = 3; // Right motor PWM speed control
+int photo  = A1; // Photo detector pin level
 
 enum Motor {LEFT, RIGHT};
 #define NUM_ANGLES 7
@@ -139,29 +138,27 @@ void Chall_2(int error) {
   gas = error*kp;
 
  //Make sure it's between -255 and 255.
- if gas > 255
-    gas = 255;
- else if gas < -255
-    gas = -255;
- end
+ if (gas > 255){
+    gas = 255;}
+ else if (gas < -255){
+    gas = -255;}
 
   //Turn left or right.
-  if gas > 0
+  if (gas > 0){
       go(RIGHT, abs(gas));
-      go(LEFT,0);
-  else if gas < 0
+      go(LEFT,0);}
+  else if (gas < 0){
       go(LEFT, abs(gas));
-      go(RIGHT,0);
-  else
-      go(LEFT, 0)
-      go(RIGHT, 0)
-  end 
+      go(RIGHT,0);}
+  else{
+      go(LEFT, 0);
+      go(RIGHT, 0);}
 }
 
 int get_yaw()
 {
   delay(time_step);
-  mpu.getMotion6(&ax, &ay, &az, &gx, &gz, &gz);
+//  mpu.getMotion6(&ax, &ay, &az, &gx, &gz, &gz);
   yaw += time_step*(gz-yaw_int)/131;
   return yaw;  
 }
@@ -180,27 +177,26 @@ void Chall_3(int level) {
 
   i = i + p;
   
-  if p  = 0
-     i = 0;
-  end
+  if (p  = 0){
+     i = 0;}
 
  //100 as constant so that it will go straight when no error. (see left below)
   gas = 100 + (d*kd) + (p*kp) + (i*ki);
 
-  if gas > 255
-    gas = 255;
-  end
+  if (gas > 255){
+    gas = 255;}
+  
 
   //Because traveling counter-clockwise, we will only need to travel right
-  go(left, 100);
-  go(right, gas);
+  go(LEFT, 100);
+  go(RIGHT, gas);
 }
 
-int get_light();
+int get_light()
 {
   delay(10);
   level = digitalRead(photo);
-  Serial.print(level)
+  Serial.print(level);
   return level;
 }
 
@@ -210,9 +206,9 @@ int get_light();
 
 void setup() {
   Serial.begin(9600);
-  pinMode(trigPin, OUTPUT);
-  pinMode(echoPin, INPUT);
-  digitalWrite (trigPin, LOW);
+//  pinMode(trigPin, OUTPUT);
+//  pinMode(echoPin, INPUT);
+//  digitalWrite (trigPin, LOW);
   pinMode(enAPin, OUTPUT);
   pinMode(in1Pin, OUTPUT);
   pinMode(in2Pin, OUTPUT);
@@ -220,13 +216,13 @@ void setup() {
   pinMode(in4Pin, OUTPUT);
   pinMode(enBPin, OUTPUT);
   pinMode(photo, INPUT);
-  servo.attach(servoPin);
-  servo.write(90);
+//  servo.attach(servoPin);
+//  servo.write(90);
   go(LEFT, 0);
   go(RIGHT, 0);
   testMotors();
-  mpu.intialize();
-  mpu.getMotion6(&ax, &ay, &az, &gx, &gz, &gz);
+//  mpu.intialize();
+//  mpu.getMotion6(&ax, &ay, &az, &gx, &gz, &gz);
   yaw_int = gz; 
   time_step = 0.1;
   yaw = 0; 
@@ -243,24 +239,24 @@ void setup() {
 // thresh = ; *************
 
   // for Challenge 2
-  desired_angle = 0;
-  kp = 0.1275;
+//  desired_angle = 0;
+//  kp = 0.1275;
 
 }
 
 
 void loop() {
 
-    // Challenge 2
-    //Determine error
-  angle = get_yaw();
-  Serial.print(yaw); 
-  error = angle-desired_angle;
-  Chall_2(error);
+//    // Challenge 2
+//    //Determine error
+//  angle = get_yaw();
+//  Serial.print(yaw); 
+//  error = angle-desired_angle;
+//  Chall_2(error);
 
     //Challenge 3
     level = get_light();
-    Chall_3(level);
+   // Chall_3(level);
     
 
 }
