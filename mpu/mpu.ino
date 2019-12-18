@@ -23,6 +23,7 @@ void setup() {
    mpu.initialize();
    Serial.println(mpu.testConnection() ? "MPU6050 connection successful" : "MPU6050 connection failed");
    count = 0;
+   output = createWriter("data.csv");
 }
 
 void loop() {
