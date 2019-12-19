@@ -1,19 +1,18 @@
-//#include <MPU6050.h>
+#include <MPU6050.h>
 // ******************** Constants ********************************************
 
 // for challenge 1
-int mspeed;
+  int mspeed;
 
-// For challenge 3
- static int i;
- static int prev_err;
- int p;
- int d;
- int gas;
- int kp;
- int kd;
- int ki;
- int thresh; // set this to sensor value on black path
+ static int yaw_count;
+ int yaw_int;
+ int time_step;
+ int16_t ax, ay, az;
+ int16_t gy, gx, gz; 
+ double freq[] = {0.5, 1, 1.5, 2, 3, 5, 8, 10, 50};;
+ double yaw;
+ int k;
+ MPU6050 mpu;
 
  //*****************************************************************************
 
@@ -80,37 +79,46 @@ void driveSinewave(double t, double freq)
 {
  double  T = 1/freq;
  double duration = T*1000;
-  Serial.println("duration = ");
-  Serial.println(duration);
+  //Serial.println("duration = ");
+  //Serial.println(duration);
   int start = millis();
   int curr = millis() - start;
-  Serial.print("t is");
-  Serial.println(curr);
-  Serial.println("in drivesine");
+  //Serial.print("t is");
+  //Serial.println(curr);
+  //Serial.println("in drivesine");
   double goSpeed;
   while(curr < duration) {
+    Serial.print(get_yaw());
+    Serial.print(",");
     goSpeed = sin(2*3.14*20*t) * 255;
     go(RIGHT, goSpeed);
     go(LEFT, -goSpeed);
-    Serial.println("first while");
-    Serial.println(goSpeed);
+    //Serial.println("first while");
+    //Serial.println(goSpeed);
     curr = millis() - start;
   }
-int   start2 = millis();
-curr = millis() - start2;
+  int   start2 = millis();
+  
+  curr = millis() - start2;
   while(curr < duration) {
-    Serial.println("second");
+    Serial.print(get_yaw());
+    Serial.print(",");
     goSpeed = sin(2*3.14*20*t) * 255;
     go(RIGHT,-goSpeed);
     go(LEFT,goSpeed);
     curr = millis() - start2;
-  }
+  }  
   go(RIGHT,0);
   go(LEFT,0);
 
 }
 
-//**************************************************************************
+double get_yaw()
+{
+  delay(100);
+  mpu.getMotion6(&ax, &ay, &az, &gx, &gy, &gz);
+  yaw += (0.1*((gz-yaw_int)/1310));
+  return yaw;  
 
 }
 
@@ -128,29 +136,37 @@ void setup() {
   //servo.write(90);
   go(LEFT, 0);
   go(RIGHT, 0);
-  testMotors();
-
-  // for challenge 3
-  gas = 0;
-  i = 0;
-  prev_err = 0;
-  mspeed = 0;
-
-
-
+  //testMotors();
+  mpu.initialize();
+  yaw_count = 1;
+  yaw = 0;
+  k = 0;
+  
 }
 
-int k = 0;
-double freq[] = {0.5, 1, 1.5, 2, 3, 5, 8, 10, 50};
 void loop() {
-  delay(100);
-  Serial.println("entered loop");
+  //delay(100);
+  //Serial.println("entered loop");
   //driveSine(20,2000);
   //sine2(50,5000);
 
   // Challenge
+  if (k < 9)
+  {
   driveSinewave(1000,freq[k]);
   k++;
+  
+  }
+  
+  if (k > 8)
+  {
+    go(LEFT, 0);
+    go(RIGHT, 0);
+    while (1)
+    {
+      
+    }
+  }
   //delay(2000);
 
 

@@ -12,7 +12,12 @@
  double kp;
  double kd;
  double ki;
+ double accel_x;
+ double accel_y;
+ double accel_z;
  double pitch_int;
+ double pitch_accel;
+ double pitch_gyro;
  double time_step;
  double desired_pitch;
  double pitch;
@@ -96,14 +101,38 @@ void Chall_4 (double pitch)
   }
     
 
-double get_pitch()
+double get_pitch_gyro()
 {
   delay(100);
   mpu.getMotion6(&ax, &ay, &az, &gx, &gy, &gz);
-  pitch += time_step*(gy-pitch_int)/131;
-  Serial.println(pitch);
-  return pitch;  
+  pitch_gyro += time_step*(gy-pitch_int)/131-.215;
+  //Serial.println(pitch);
+  return pitch_gyro;  
 }
+
+double get_pitch_accel()
+{
+  mpu.getMotion6(&ax, &ay, &az, &gx, &gy, &gz);
+  accel_x = ax/16384.0;
+  accel_y = ay/16384.0;
+  accel_z = az/16384.0;
+  pitch_accel = (atan(-1*accel_x/sqrt((accel_y*accel_y)+(accel_z*accel_z))));
+  //Serial.println(pitch_accel);
+  return pitch_accel*33;
+  
+}
+
+//Completmentary filter
+double get_pitch()
+{
+  double filter = .02;
+  double pitch_A = (get_pitch_accel()+0.1)*33;
+  double pitch_G = get_pitch_gyro();
+  pitch = (1-filter)*pitch_A + filter*(pitch_G);
+  return pitch; 
+}
+
+
 
 // ***************************************************
 
@@ -136,21 +165,27 @@ void setup() {
   pitch = 0;
   mpu.initialize();
   //PID
-  kp = 5;
+  kp = .1;
   kd = .1;
   ki = .1;
+  pitch = get_pitch();
+  pitch = get_pitch();
+  pitch_int = get_pitch();
 
 }
 
 
 void loop() {
-  delay(2000);
-  Serial.println("entered loop");
+  //Serial.println("entered loop");
   //driveSine(20,15000);
   //delay(2000);
 
     //Determine error
   pitch = get_pitch();
-  Chall_4(pitch);
+  //Serial.println(pitch-pitch_int);
+  //Serial.print("accel = ");
+  //Serial.println(get_pitch_accel()-pitch_int);
+  Serial.println((pitch-pitch_int-50));
+  Chall_4((pitch-pitch_int));
 
 }
