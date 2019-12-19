@@ -135,16 +135,19 @@ void setup() {
   pinMode(photo, INPUT);
 //  servo.attach(servoPin);
 //  servo.write(90);
-//  go(LEFT, 0);
-//  go(RIGHT, 0);
+  go(LEFT, 0);
+  go(RIGHT, 0);
 //  testMotors();
-//  mpu.intialize();
-//  mpu.getMotion6(&ax, &ay, &az, &gx, &gz, &gz);
+  mpu.initialize();
+  mpu.getMotion6(&ax, &ay, &az, &gx, &gz, &gz);
   yaw_int = gz; 
+  
   time_step = 0.1;
   yaw = 0; 
   kp = 250;
   desired_angle = 0; 
+  Serial.print("print me");
+    
   
 
 }

@@ -15,6 +15,7 @@
  double pitch_int;
  double time_step;
  double desired_pitch;
+ double pitch;
  int16_t ax, ay, az;
  int16_t gy, gx, gz; 
  MPU6050 mpu; 
@@ -60,119 +61,10 @@ void go( enum Motor m, int speed)
 
 
 
-//// *********************** Challenge 1 ***********************************
-//
-//// For imu
-///* 
-//*/
-//
-//// duration is in ms
-//// freq is in Hz
-//void driveSine(int freq, int duration) {
-//  Serial.print("f = ");
-//  Serial.println(freq);
-//  int start = millis();
-//  int t = millis() - start;
-//  int mspeed = 0;
-//  while(t < duration) {
-//    Serial.print("t = ");
-//    Serial.println(t);
-//    mspeed = sin(2*PI*freq*t)*255*20;
-//    if (mspeed > 255) {
-//      mspeed = 255;
-//    }
-//    //analogWrite(enBPin,mspeed); // if you input a positive mspeed the motors won't spin...
-//    //analogWrite(enAPin,mspeed); 
-//    Serial.print("moter speed = ");
-//    Serial.println(mspeed);
-//    go(LEFT,-mspeed);
-//    go(RIGHT,mspeed);
-//    t = millis() - start; 
-//  }
-//  go(LEFT,0);
-//  go(RIGHT,0);
-//  Serial.println("switch direction");
-//  start = millis();
-//  t = millis() - start;
-//  mspeed = 0;
-//  while(t < duration) {
-//    mspeed = sin(2*PI*freq*t)*255*20;
-//    mspeed = sin(2*PI*freq*t)*255*20;
-//    if (mspeed > 255) {
-//      mspeed = 255;
-//    }
-//    go(LEFT,mspeed);
-//    go(RIGHT,-mspeed);
-//    t = millis() - start; 
-//  }
-//  go(LEFT,0);
-//  go(RIGHT,0);
-//  Serial.println("end of driveSine");
-//}
-
-//**************************************************************************
 
 
 
 
-//// ********************* Challenge 2 ************************************************
-//
-//void Chall_2(int error) {
-//
-//
-//  //Write gas to motor pin.
-//  gas = error*kp;
-//
-// //Make sure it's between -255 and 255.
-// if (gas > 255){
-//    gas = 255;}
-// else if (gas < -255){
-//    gas = -255;
-//}
-//  //Turn left or right.
-//  if (gas > 0){
-//      go(RIGHT, abs(gas));
-//      go(LEFT,0);
-//  }
-//  else if (gas < 0){
-//      go(LEFT, abs(gas));
-//      go(RIGHT,0);
-//  }
-//  else{
-//      go(LEFT, 0);
-//      go(RIGHT, 0);
-//  }
-//}
-
-//******************************************************************************
-
-
-
-// ****************** Challenge 3*********
-//void Chall_3(kp,kd,ki) {
-//
-//  p = level - thresh;
-//  
-//  d = p - prev_err;
-//  prev_err = p;
-//
-//  i = i + p;
-//  
-//  if p  = 0
-//     i = 0;
-//  end
-//
-// //100 as constant so that it will go straight when no error. (see left below)
-//  gas = 100 + (d*kd) + (p*kp) + (i*ki);
-//
-//  if gas > 255
-//    gas = 255;
-//  end
-//
-//  //Because traveling counter-clockwise, we will only need to travel right
-//  go(left, 100);
-//  go(right, gas);
-//}
 
 void Chall_4 (double pitch)
 {
@@ -204,7 +96,7 @@ void Chall_4 (double pitch)
   }
     
 
-double pitch = get_pitch()
+double get_pitch()
 {
   delay(100);
   mpu.getMotion6(&ax, &ay, &az, &gx, &gy, &gz);
@@ -219,6 +111,7 @@ double pitch = get_pitch()
 
 void setup() {
   Serial.begin(9600);
+  /*
   pinMode(trigPin, OUTPUT);
   pinMode(echoPin, INPUT);
   digitalWrite (trigPin, LOW);
@@ -230,15 +123,17 @@ void setup() {
   pinMode(enBPin, OUTPUT);
   servo.attach(servoPin);
   servo.write(90);
+  */
   go(LEFT, 0);
   go(RIGHT, 0);
-  mpu.intialize();
+  mpu.initialize();
   mpu.getMotion6(&ax, &ay, &az, &gx, &gy, &gz);
   pitch_int = gy; 
   time_step = 0.1;
   pitch = 0; 
   prev_err = 0;
   desired_pitch = -1;
+  pitch = 0;
   mpu.initialize();
   //PID
   kp = 5;
@@ -251,8 +146,8 @@ void setup() {
 void loop() {
   delay(2000);
   Serial.println("entered loop");
-  driveSine(20,15000);
-  delay(2000);
+  //driveSine(20,15000);
+  //delay(2000);
 
     //Determine error
   pitch = get_pitch();
