@@ -144,9 +144,9 @@ void setup() {
   
   time_step = 0.1;
   yaw = 0; 
-  kp = 250;
+  kp = 200;
   desired_angle = 0; 
-  Serial.print("print me");
+  Serial.println("print me");
     
   
 
