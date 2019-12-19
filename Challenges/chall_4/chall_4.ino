@@ -23,6 +23,7 @@
  double pitch;
  int16_t ax, ay, az;
  int16_t gy, gx, gz; 
+ double pitch_recal;
  MPU6050 mpu; 
  
  //*****************************************************************************
@@ -87,6 +88,7 @@ void Chall_4 (double pitch)
 
  //100 as constant so that it will go straight when no error. (see left below)
   gas = (d*kd) + (p*kp) + (i*ki);
+  
 
 //make sure this is within the motor's ability
   if (gas > 255) {
@@ -118,7 +120,7 @@ double get_pitch_accel()
   accel_z = az/16384.0;
   pitch_accel = (atan(-1*accel_x/sqrt((accel_y*accel_y)+(accel_z*accel_z))));
   //Serial.println(pitch_accel);
-  return pitch_accel*33;
+  return pitch_accel*10;
   
 }
 
@@ -139,7 +141,7 @@ double get_pitch()
 
 
 void setup() {
-  Serial.begin(9600);
+  //Serial.begin(9600);
   /*
   pinMode(trigPin, OUTPUT);
   pinMode(echoPin, INPUT);
@@ -159,18 +161,24 @@ void setup() {
   mpu.getMotion6(&ax, &ay, &az, &gx, &gy, &gz);
   pitch_int = gy; 
   time_step = 0.1;
-  pitch = 0; 
+  pitch = 0;
   prev_err = 0;
   desired_pitch = -1;
   pitch = 0;
   mpu.initialize();
   //PID
-  kp = .1;
-  kd = .1;
-  ki = .1;
+  kp = 7;
+  kd = 0.01;
+  ki = .010;
   pitch = get_pitch();
   pitch = get_pitch();
   pitch_int = get_pitch();
+  pitch_recal = 0;
+  for (int i =0; i < 1000; i++)
+  {
+    pitch_recal += get_pitch_accel();
+  }
+  pitch_recal = pitch_recal/1000;
 
 }
 
@@ -181,11 +189,11 @@ void loop() {
   //delay(2000);
 
     //Determine error
-  pitch = get_pitch();
+  pitch = get_pitch_accel();
   //Serial.println(pitch-pitch_int);
   //Serial.print("accel = ");
   //Serial.println(get_pitch_accel()-pitch_int);
-  Serial.println((pitch-pitch_int-50));
-  Chall_4((pitch-pitch_int));
+  //Serial.println(10*(pitch-pitch_recal));
+  Chall_4(10*(pitch-pitch_recal));
 
 }
