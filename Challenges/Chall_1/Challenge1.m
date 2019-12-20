@@ -69,6 +69,3 @@ bode(H2);
 title("Bode Plot for Transfer Function 50*(s-10)*(s-15)*(s-8)/((s-13)*(s-18)*s^2)");
 
 
-
-
-
