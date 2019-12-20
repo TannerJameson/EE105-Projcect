@@ -44,9 +44,9 @@ freq_vec = 2*pi*[.5 1 1.5 2 3 5 8 10 50];
 ang_vec = [vpt5 v1 v1pt5 v2 v3 v5 v8 v10 v50];
 figure;
 plot(10*log10(freq_vec),20*log10(ang_vec))
-title('Bode Plot from Data')
-ylabel('Angle(dB)')
-xlabel('Frequency(dB)')
+title('Frequency Response of Angle Data')
+ylabel('Magnitude (dB)')
+xlabel('Frequency (dB)')
 
 
 
@@ -59,8 +59,14 @@ H=num/denom;
 %plot transfer function
 figure;
 bode(H);
+title("Bode Plot for Transfer Function 1/s");
 
 
+% Try adding poles and zeros based on our data
+H2 = 50*(s-10)*(s-15)*(s-8)/((s-13)*(s-18)*s^2);
+figure;
+bode(H2);
+title("Bode Plot for Transfer Function 50*(s-10)*(s-15)*(s-8)/((s-13)*(s-18)*s^2)");
 
 
 
